@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>JokeRate AI</title>
+<style>
+:root{--paper:#f4f0e8;--ink:#161616;--red:#ff5b3d;--blue:#4057ff;--line:#161616}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+.wrap{max-width:1180px;margin:auto;padding:0 28px}
+header{height:82px;border-bottom:2px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:21px;font-weight:900;letter-spacing:-1px}
+.logo i{display:inline-block;width:10px;height:10px;background:var(--red);margin-left:5px;border-radius:50%}
+nav{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.hero{padding:76px 0 54px;display:grid;grid-template-columns:1.5fr 1fr;gap:70px;align-items:end}
+.kicker{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.14em;margin-bottom:20px}
+h1{font-size:clamp(58px,9vw,116px);line-height:.82;letter-spacing:-.075em;margin:0;max-width:760px}
+.hero-copy{font-size:17px;line-height:1.55;max-width:340px;margin:0 0 7px}
+.cards{display:grid;grid-template-columns:1fr 1fr;border-top:2px solid var(--line);border-bottom:2px solid var(--line)}
+.card{padding:34px 0;min-height:500px}
+.card:first-child{padding-right:42px;border-right:2px solid var(--line)}
+.card:last-child{padding-left:42px}
+.label{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
+.label h2{font-size:25px;margin:0;letter-spacing:-.04em}
+.number{font-size:12px;font-weight:800}
+textarea,select{font:inherit;border:2px solid var(--line);background:transparent;color:var(--ink);width:100%;border-radius:0;padding:16px;outline:none}
+textarea{height:190px;resize:vertical;font-size:16px;line-height:1.5}
+textarea:focus,select:focus{background:#fffaf0}
+select{height:52px;margin-top:12px}
+button{border:2px solid var(--line);background:var(--ink);color:white;font:inherit;font-weight:800;padding:15px 20px;cursor:pointer}
+button:hover{background:var(--red);border-color:var(--red)}
+button.alt{background:transparent;color:var(--ink)}
+.actions{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:12px}
+.result{display:none;margin-top:24px;border-top:2px solid var(--line);padding-top:20px}
+.result.show{display:block}
+.scoreline{display:flex;align-items:baseline;gap:8px}
+.score{font-size:72px;font-weight:900;letter-spacing:-.07em}
+.outof{font-size:15px;font-weight:700}
+.bar{height:12px;background:#ddd5c8;margin:14px 0 13px}
+.bar i{display:block;height:100%;background:var(--red);width:0;transition:.4s}
+.feedback{font-size:14px;line-height:1.55;max-width:530px}
+.joke-stage{height:257px;border:2px solid var(--line);padding:28px;display:flex;align-items:center;position:relative;background:#fffaf0}
+.joke-stage:before{content:"“";position:absolute;top:-25px;left:17px;background:var(--paper);font-family:Georgia,serif;font-size:72px;line-height:1;padding:0 8px}
+.joke{font-family:Georgia,serif;font-size:30px;line-height:1.2;letter-spacing:-.035em}
+.generate{display:grid;grid-template-columns:1fr 130px;gap:10px;margin-top:12px}
+footer{display:flex;justify-content:space-between;padding:24px 0 38px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+@media(max-width:800px){
+ .wrap{padding:0 18px} header{height:68px}.hero{display:block;padding:52px 0 42px}.hero-copy{margin-top:28px}
+ .cards{grid-template-columns:1fr}.card:first-child{border-right:0;border-bottom:2px solid var(--line);padding-right:0}.card:last-child{padding-left:0}
+ .joke{font-size:25px}.actions,.generate{grid-template-columns:1fr}
+ footer{gap:10px;flex-direction:column}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><div class="logo">JokeRate<span> AI</span><i></i></div><nav>comedy / 01</nav></header>
+
+<section class="hero">
+  <div><div class="kicker">A small corner for bad ideas</div><h1>Make it<br>funny.</h1></div>
+  <p class="hero-copy">Tes jokes kamu. Cari punchline baru. Tidak perlu terlalu serius.</p>
+</section>
+
+<section class="cards">
+<article class="card">
+  <div class="label"><h2>Rate a joke</h2><span class="number">01</span></div>
+  <textarea id="input" placeholder="Tulis jokes kamu di sini..."></textarea>
+  <select id="kind"><option value="general">General</option><option value="dad">Dad joke</option><option value="tech">Tech</option><option value="absurd">Absurd</option></select>
+  <div class="actions"><button onclick="rate()">Rate it</button><button class="alt" onclick="clearRate()">Clear</button></div>
+  <div id="result" class="result">
+    <div class="scoreline"><span id="score" class="score">—</span><span class="outof">/ 10</span></div>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="feedback" class="feedback"></div>
+  </div>
+</article>
+
+<article class="card">
+  <div class="label"><h2>Give me one</h2><span class="number">02</span></div>
+  <div class="joke-stage"><div id="joke" class="joke">Tekan tombol. Lihat apa yang terjadi.</div></div>
+  <div class="generate">
+    <select id="genkind"><option value="general">General</option><option value="dad">Dad joke</option><option value="tech">Tech</option><option value="absurd">Absurd</option></select>
+    <button onclick="generate()">Another</button>
+  </div>
+  <div style="margin-top:12px"><button class="alt" style="width:100%" onclick="copyJoke()">Copy joke</button></div>
+</article>
+</section>
+
+<footer><span>JokeRate AI</span><span>© 2026 / made for laughs</span></footer>
+</div>
+
+<script>
+const jokes={
+general:["Aku mau diet, tapi kulkas selalu bilang: “Jangan pergi, kita punya masa depan.”","Aku bukan malas. Aku sedang memberi tubuh kesempatan untuk tidak bekerja.","Kenapa kalender santai? Karena semua harinya sudah terjadwal."],
+dad:["Kenapa buku matematika sedih? Karena terlalu banyak masalah.","Apa yang dilakukan komputer saat lapar? Makan byte.","Kenapa sapu selalu sukses? Karena dia punya banyak support."],
+tech:["Aku mencoba debug hidupku. Ternyata error-nya ada di bagian user.","Programmer kalau putus cinta tidak bilang selesai. Dia bilang: connection closed.","Wi-Fi itu mirip hubungan. Kalau terlalu jauh, mulai putus-putus."],
+absurd:["Aku bertanya pada kulkas tentang masa depan. Jawabannya: dingin.","Ayam menyeberang jalan bukan karena tujuan. Dia cuma penasaran.","Kalau ikan punya internet, password-nya mungkin netfish."]
+};
+function rate(){
+ const t=document.getElementById('input').value.trim(); if(!t){alert('Tulis jokes dulu.');return}
+ let s=5, l=t.toLowerCase();
+ [['kenapa',.8],['karena',.5],['?',.35],['!',.15],['tapi',.2],['kalau',.2]].forEach(x=>{if(l.includes(x[0]))s+=x[1]});
+ if(t.length<25)s-=.8;if(t.length>180)s-=.4;
+ s=Math.max(1,Math.min(10,Math.round(s*10)/10));
+ document.getElementById('score').textContent=s.toFixed(1);
+ document.getElementById('bar').style.width=(s*10)+'%';
+ document.getElementById('feedback').textContent=s>=8.5?'Punchline kuat. Jangan terlalu banyak dijelaskan.':s>=7?'Sudah kena. Coba bikin ending sedikit lebih tidak terduga.':s>=5?'Idenya ada. Pendekkan setup dan tajamkan punchline.':'Belum cukup kena. Cari angle yang lebih sederhana dan mengejutkan.';
+ document.getElementById('result').classList.add('show');
+}
+function clearRate(){document.getElementById('input').value='';document.getElementById('result').classList.remove('show')}
+function generate(){const a=jokes[document.getElementById('genkind').value];document.getElementById('joke').textContent=a[Math.floor(Math.random()*a.length)]}
+async function copyJoke(){const t=document.getElementById('joke').textContent;try{await navigator.clipboard.writeText(t);alert('Copied.')}catch(e){alert(t)}}
+</script>
+</body>
+</html>
